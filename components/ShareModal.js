@@ -61,25 +61,25 @@ function ShareModal({postID}) {
                 <div className="w-full space-y-1 mt-3">
                   <div className="w-full">
                   <p className="text-white text-[14px]">Copy post link : </p>
-                    <button onClick={() => {navigator.clipboard.writeText(`http://localhost:3000/${postID}`); setIsOpen(false); setIsClipBoardOpen(true)}} className="bg-white border-none outline-none hover:bg-transparent hover:text-white transition-all mt-2 w-8 h-8 rounded-full flex items-center justify-center"><LinkIcon className="h-4" /></button>
+                    <button onClick={() => {navigator.clipboard.writeText(`https://moba-six.vercel.app/${postID}`); setIsOpen(false); setIsClipBoardOpen(true)}} className="bg-white border-none outline-none hover:bg-transparent hover:text-white transition-all mt-2 w-8 h-8 rounded-full flex items-center justify-center"><LinkIcon className="h-4" /></button>
                   </div>
                   <div className="mt-2">
                   <p className="text-white text-[14px]">Or width : </p>
                   <div className="w-full py-2 flex justify-start items-center space-x-2">
                   <FacebookShareButton onClick={() => {setIsOpen(false)}}
-                    url={`http://localhost:3000/${postID}`} >
+                    url={`https://moba-six.vercel.app/${postID}`} >
                     <FacebookIcon size={32} round />
                   </FacebookShareButton>
                   <WhatsappShareButton onClick={() => {setIsOpen(false)}}
-                    url={`http://localhost:3000/${postID}`} >
+                    url={`https://moba-six.vercel.app/${postID}`} >
                     <WhatsappIcon size={32} round />
                   </WhatsappShareButton>
                   <LinkedinShareButton onClick={() => {setIsOpen(false)}}
-                    url={`http://localhost:3000/${postID}`} >
+                    url={`https://moba-six.vercel.app/${postID}`} >
                     <LinkedinIcon size={32} round />
                   </LinkedinShareButton>
                   <RedditShareButton onClick={() => {setIsOpen(false)}}
-                    url={`http://localhost:3000/${postID}`} >
+                    url={`https://moba-six.vercel.app/${postID}`} >
                     <RedditIcon size={32} round />
                   </RedditShareButton>
                   </div>
