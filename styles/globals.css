@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-black;
+  }
+}
+html,body{
+  width: 100%;
+  overflow-x: hidden;
+}
+.sidebarModalBoxShadow{
+  --tw-shadow: 0 0px 5px 5px rgba(51,51,51,1);
+    --tw-shadow-colored: 0 0px 5px 5px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
+}
+.EditProfileImg::before{
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%,-50%);
+  background: black;
+  opacity: 0.4;
+  width: 100%;
+  height: 100%;
+  transition:all 300ms;
+}
+.EditProfileImg:hover::before{
+  opacity:0.7
+}
+.form-group{
+  width: 90%;
+  border: 2px solid rgb(51, 54, 57);
+  border-radius: 10px;
+  padding: 10px;
+  margin: 10px 0;
+}
+.form-group input,
+.form-group textarea {
+  background:transparent;
+  color: white;
+  border: none;
+  outline: none;
+  width: 100%;
+  height: 100%;
+}
+.form-group textarea{
+  max-height:80px;
+}
+.form-group div{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.form-group h5{
+  font-size: 14px;
+  --tw-text-opacity: 1;
+  color: #71767b;
+}
+.form-group span{
+  font-size: 14px;
+  --tw-text-opacity: 1;
+  color: #71767b;
+}
+.scrollbarHidden::-webkit-scrollbar{
+  display:none;
+}
+.scrollbarHidden{
+  scrollbar-width: none;
+  --ms-overflow-style:none;
+}
+.messageBG{
+  background: rgb(221,20,81);
+background: linear-gradient(90deg, rgba(221,20,81,1) 7%, rgba(9,68,121,1) 54%, rgba(0,224,255,1) 89%);
+}
+@layer components {
+  .hoverAnimation {
+    @apply hover:bg-[#d9d9d9] hover:bg-opacity-10 rounded-full cursor-pointer  w-[40px] h-[40px] sm:w-[52px] sm:h-[52px] xl:w-auto xl:h-auto xl:py-3 xl:px-3 transition duration-200 ease-out;
+  }
+
+  .icon {
+    @apply cursor-pointer w-9 h-9 hover:bg-[#1d9bf0] hover:bg-opacity-10 flex items-center justify-center rounded-full transition ease-out;
+  }
+
+  .tag {
+    @apply text-[#1d9bf0] font-normal hover:underline cursor-pointer;
+  }
+}
+
+
+@media (max-width: 640px) {
+  .chatScreen{
+    width:100%;
+    height:100vh;
+  }
+
+  .chatSideBar{
+
+    width:100vw !important;
+    height:100vh;
+  }
+}
