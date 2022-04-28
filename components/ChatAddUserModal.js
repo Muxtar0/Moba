@@ -23,7 +23,7 @@ function chatAddUserModal({userDatas}) {
     const isUserHaveFunc = (e) => {
       setInput(e.target.value)
       for(const se in userDatas){
-        if(userDatas[se].tag.includes(e.target.value)){
+        if(userDatas[se].tag.includes(e.target.value.toLowerCase())){
           setSearchingResults([userDatas[se]])
         }
       }
