@@ -1,7 +1,7 @@
 import { useRecoilState, useResetRecoilState } from "recoil";
 import { chatAddUserModalState } from "../atoms/modalAtom";
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useEffect, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { XIcon , LinkIcon } from "@heroicons/react/solid";
 import { useAuthState } from "react-firebase-hooks/auth";
 import { auth, db } from "../firebase";
@@ -16,15 +16,22 @@ function chatAddUserModal({userDatas}) {
     const userTag = user.email.split("@");
     const userChatRef = query(collection(db, "chats"), where("users", "array-contains", userTag[0]));
     const [chatsSnapshot] = useCollection(userChatRef)
+    const [searchingResults,setSearchingResults] = useState([])
     const [isUserHave,setIsUserHave] = useState(false)
     const [input,setInput] = useState("")
+    const addUserInputRef = useRef()
     const isUserHaveFunc = (e) => {
-        setInput(e.target.value)
-        for(let i = 0 ; i < userDatas.length;i++){
-            if(userDatas[i].tag == e.target.value) {
-                setIsUserHave(true)
-            }
+      setInput(e.target.value)
+      for(const se in userDatas){
+        if(userDatas[se].tag.includes(e.target.value)){
+          setSearchingResults([userDatas[se]])
         }
+      }
+      for(let i = 0 ; i < userDatas.length;i++){
+        if(userDatas[i].tag == e.target.value) {
+          setIsUserHave(true)
+        }
+      }      
     }
   const createChat = () => {    
     if(isUserHave == true){
@@ -84,7 +91,20 @@ const chatAlreadyExsist = (recipientTag) => !!chatsSnapshot?.docs.find((chat) =>
               <div className="flex flex-col px-4 pt-5 pb-2.5 sm:px-6">
                 <div className="w-full pb-5">
                   <h2 className="text-white font-bold text-[18px]">Write User Tag</h2>
-                  <input type="text" placeholder="Write user tag..." onChange={(e) => isUserHaveFunc(e)} className="w-full mt-4  text-white  px-2 py-2   border-none rounded-[10px] bg-[#1f1f1f] outline-none"/>
+                  <input type="text" ref={addUserInputRef} placeholder="Write user tag..." onChange={(e) => isUserHaveFunc(e)} className="w-full mt-4  text-white  px-2 py-2   border-none rounded-[10px] bg-[#1f1f1f] outline-none"/>
+                  <div  className="max-h-[300px] overflow-y-auto">
+                  {searchingResults.map((result) => (
+                    
+                    <div key={result.id} onClick={() => {addUserInputRef.current.value = result.tag}} className="flex items-center justify-start cursor-pointer hover:opacity-75 my-1 py-2">
+                    <img className="w-[40px] h-[40px] rounded-full object-cover" src={result.photoUrl} />
+                    <div className="ml-4">
+                        <h3 className="font-bold text-white">{result.name}</h3>
+                        <p className="text-[14px] text-gray-700">{result.tag}</p>
+                    </div>
+                  </div>
+                  ))}
+                  </div>
+                  
                   <button onClick={createChat} className="text-white text-center w-full py-3">Add</button>
                 </div>
                 
