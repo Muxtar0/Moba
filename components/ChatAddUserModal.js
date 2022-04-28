@@ -22,16 +22,23 @@ function chatAddUserModal({userDatas}) {
     const addUserInputRef = useRef()
     const isUserHaveFunc = (e) => {
       setInput(e.target.value)
-      for(const se in userDatas){
-        if(userDatas[se].tag.includes(e.target.value.toLowerCase())){
-          setSearchingResults([userDatas[se]])
+      if(e.target.value !== ""){
+        for(const se in userDatas){
+          if(userDatas[se].name.toLowerCase().includes(e.target.value.toLowerCase()) || userDatas[se].tag.includes(e.target.value.toLowerCase())){
+            setSearchingResults([userDatas[se]])
+          }
         }
+        for(let i = 0 ; i < userDatas.length;i++){
+          if(userDatas[i].tag == e.target.value) {
+            setIsUserHave(true)
+          }
+        }      
       }
-      for(let i = 0 ; i < userDatas.length;i++){
-        if(userDatas[i].tag == e.target.value) {
-          setIsUserHave(true)
-        }
-      }      
+      else{
+        setSearchingResults([])
+      }
+      
+      
     }
   const createChat = () => {    
     if(isUserHave == true){
