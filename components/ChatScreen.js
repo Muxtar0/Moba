@@ -32,7 +32,7 @@ function ChatScreen({chat,messages}) {
         endOfMessageRef.current.scrollIntoView({
             behavior: "smooth",
             block:"start", 
-        })
+        })  
     }
     const showMessages = () => {
         if(messagesSnapshot){
@@ -83,7 +83,7 @@ function ChatScreen({chat,messages}) {
               lastSeen:serverTimestamp(),
             }, {merge:true});
             
-            const imageRef = ref(storage , `chats/chat/${router.query.id}/image`)
+            const imageRef = ref(storage , `chats/chat/${router.query.id}/${Math.random()}`)
   
                await uploadString(imageRef,selectedFile,"data_url").then(async () => {
                 const downloadURL = await getDownloadURL(imageRef);
