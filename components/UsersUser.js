@@ -12,7 +12,7 @@ function UsersUser({Datas}) {
             </div>
         </div>
         {Datas.map((user) => (
-            <div key={user.id} onClick={() => router.push(`/user/${user.tag}`)} className="flex cursor-pointer items-center group py-4 px-4 border-b border-t border-gray-700 transition hover:bg-gray-700">
+            <div key={user.id} onClick={() => router.push(`/user/${user.tag}`)} className="flex cursor-pointer items-center group py-4 px-4 border-b  border-gray-700 transition hover:bg-gray-700">
                 <img className='w-[50px] h-[50px] object-cover rounded-full' src={user.photoUrl} />
                 <div className="ml-4">
                     <h3 className="font-bold">{user.name}</h3>

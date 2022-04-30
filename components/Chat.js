@@ -30,7 +30,7 @@ function Chat({id,users}) {
               ) : (
                 <h3 className="font-bold text-white">{recipient.name}</h3>
               )}
-              <p className="text-[14px] text-gray-700">{recipientTag}</p>
+              <p className="text-[14px] text-gray-700">@{recipientTag}</p>
             </div>
           )}
         </div>

@@ -28,11 +28,7 @@ function chatAddUserModal({userDatas}) {
             setSearchingResults([userDatas[se]])
           }
         }
-        for(let i = 0 ; i < userDatas.length;i++){
-          if(userDatas[i].tag == e.target.value) {
-            setIsUserHave(true)
-          }
-        }      
+            
       }
       else{
         setSearchingResults([])
@@ -41,20 +37,25 @@ function chatAddUserModal({userDatas}) {
       
     }
   const createChat = () => {    
+    let isUserHave =false
+    for(let i = 0 ; i < userDatas.length;i++){
+      if(userDatas[i].tag == addUserInputRef.current.value) {
+        isUserHave= true;
+      }
+    }  
     if(isUserHave == true){
-        if(input !== userTag[0] && !chatAlreadyExsist(input)){
+        if(addUserInputRef.current.value !== userTag[0] && !chatAlreadyExsist(addUserInputRef.current.value)){
             addDoc(collection(db, "chats"), {
-                users:[userTag[0],input],
+                users:[userTag[0],addUserInputRef.current.value],
             });
             setIsOpen(false)
         }
         else{
             alert("Some Error.Try again")
         }
-        setIsUserHave(false)
     }
     else{
-        alert("This user does not exist.Please try again")
+        alert("This user doesn't exist.Please try again")
     }
 }    
 const chatAlreadyExsist = (recipientTag) => !!chatsSnapshot?.docs.find((chat) => 
@@ -102,11 +103,13 @@ const chatAlreadyExsist = (recipientTag) => !!chatsSnapshot?.docs.find((chat) =>
                   <div  className="max-h-[300px] overflow-y-auto">
                   {searchingResults.map((result) => (
                     
-                    <div key={result.id} onClick={() => {addUserInputRef.current.value = result.tag}} className="flex items-center justify-start cursor-pointer hover:opacity-75 my-1 py-2">
+                    <div key={result.id} onClick={() => {
+                      addUserInputRef.current.value = result.tag;
+                    }} className="flex items-center justify-start cursor-pointer hover:opacity-75 my-1 py-2">
                     <img className="w-[40px] h-[40px] rounded-full object-cover" src={result.photoUrl} />
                     <div className="ml-4">
                         <h3 className="font-bold text-white">{result.name}</h3>
-                        <p className="text-[14px] text-gray-700">{result.tag}</p>
+                        <p className="text-[14px] text-gray-700">@{result.tag}</p>
                     </div>
                   </div>
                   ))}

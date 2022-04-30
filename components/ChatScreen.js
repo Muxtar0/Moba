@@ -4,10 +4,11 @@ import React, { useEffect, useRef, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { useCollection } from 'react-firebase-hooks/firestore'
 import { auth, db } from '../firebase'
-import Message from '../components/Message'
+import Message from './Message'
 import getRecipientTag from '../utils/getRecipientTag'
 import Moment from 'react-moment'
-import { PaperAirplaneIcon,XIcon } from "@heroicons/react/solid";
+import { PaperAirplaneIcon,XIcon,MicrophoneIcon,PauseIcon } from "@heroicons/react/solid";
+import { useReactMediaRecorder } from "react-media-recorder";
 import { Picker } from 'emoji-mart'
 import 'emoji-mart/css/emoji-mart.css'
 import {
@@ -20,6 +21,13 @@ function ChatScreen({chat,messages}) {
     const router = useRouter()
     const size = useWindowSize();
     const [showEmojis, setShowEmojis] = useState(false)
+
+    const [second, setSecond] = useState("00");
+    const [minute, setMinute] = useState("00");
+    const [isActive, setIsActive] = useState(false);
+    const [counter, setCounter] = useState(0);
+    const [vocieMessageStart,setVoiceMessageStart] = useState(false);
+
     const [messagesSnapshot] = useCollection(query(collection(db,"chats",router.query.id,"messages"),orderBy("timeStamp",'asc')))
     const [recipientSnapshot] = useCollection(query(collection(db,"users"),where('tag' , "==", getRecipientTag(chat.users,user))))
     const scrollToBottom = () => {
@@ -52,21 +60,92 @@ function ChatScreen({chat,messages}) {
             ))
         }
     }
+    useEffect(() => {
+        let intervalId;
+    
+        if (isActive) {
+          intervalId = setInterval(() => {
+            const secondCounter = counter % 60;
+            const minuteCounter = Math.floor(counter / 60);
+    
+            let computedSecond =
+              String(secondCounter).length === 1
+                ? `0${secondCounter}`
+                : secondCounter;
+            let computedMinute =
+              String(minuteCounter).length === 1
+                ? `0${minuteCounter}`
+                : minuteCounter;
+    
+            setSecond(computedSecond);
+            setMinute(computedMinute);
+    
+            setCounter((counter) => counter + 1);
+          }, 650);
+        }
+    
+        return () => clearInterval(intervalId);
+      }, [isActive, counter]);
+      function stopTimer() {
+        setIsActive(false);
+        setCounter(0);
+        setSecond("00");
+        setMinute("00");
+      }
+      const {
+        status,
+        startRecording,
+        stopRecording,
+        pauseRecording,
+        mediaBlobUrl
+      } = useReactMediaRecorder({
+        video: false,
+        audio: true,
+        echoCancellation: true
+      });
+
+      const convertFileToBase64 = (file) =>
+            new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file.mediaBlobUrl);
+
+            reader.onload = () =>
+                resolve({
+                fileName: file.title,
+                base64: reader.result
+                });
+            reader.onerror = reject;
+        });
 
     const sendMessage = (e) => {
         e.preventDefault();
-        if(e.target.value !== undefined || e.target.value !== " " || e.target.value !== "" || e.target.value !== null){
+        if(vocieMessageStart){
+            console.log("deed: ", mediaBlobUrl);
+            setVoiceMessageStart(false)
             setDoc(doc(db, "users", user.uid), {
                 lastSeen:serverTimestamp(),
             }, {merge:true});
             const docRef = addDoc(collection(db,'chats',router.query.id,"messages") , {
                 timeStamp:serverTimestamp(),
-                message:input,
+                message:mediaBlobUrl,
                 user:user.email.split("@")[0]
             })
-            setInput("")
-            setShowEmojis(false)
             scrollToBottom()
+        }
+        else{
+            if(e.target.value !== undefined || e.target.value !== " " || e.target.value !== "" || e.target.value !== null){
+                setDoc(doc(db, "users", user.uid), {
+                    lastSeen:serverTimestamp(),
+                }, {merge:true});
+                const docRef = addDoc(collection(db,'chats',router.query.id,"messages") , {
+                    timeStamp:serverTimestamp(),
+                    message:input,
+                    user:user.email.split("@")[0]
+                })
+                setInput("")
+                setShowEmojis(false)
+                scrollToBottom()
+            }
         }
     }
     const addEmoji = (e) => {
@@ -130,11 +209,44 @@ function ChatScreen({chat,messages}) {
                 />
               )}
         <div className="flex bg-black border-t border-gray-800 items-center px-3 py-3 sticky bottom-0 z-[100]">
-            {size.width > 640 && (
+            {size.width > 640 ? ( vocieMessageStart == false ? (
                 <button onClick={() => setShowEmojis(!showEmojis)}><EmojiHappyIcon className="h-5 text-white px-3" /></button>
+            ) : ""
+                
+            ) : ''}
+            {vocieMessageStart == false ? (
+                <input value={input} onChange={e => setInput(e.target.value)} placeholder="Write Something..." className="flex-1 text-white items-center px-2 py-2 sticky bottom-0 border-none rounded-[10px] bg-[#1f1f1f] outline-none" type="text" />
+            ) : ""}
+            {!vocieMessageStart && (
+                <button className="pl-2" onClick={() => {
+                    setVoiceMessageStart(true)
+                      if (!isActive) {
+                        startRecording();
+                      } else {
+                        pauseRecording();
+                      }
+    
+                      setIsActive(!isActive);
+                    }}>
+                        <MicrophoneIcon className="h-5 text-white" />
+                    
+                </button>
             )}
-            <input value={input} onChange={e => setInput(e.target.value)} placeholder="Write Something..." className="flex-1 text-white items-center px-2 py-2 sticky bottom-0 border-none rounded-[10px] bg-[#1f1f1f] outline-none" type="text" />
-            <button  type="submit" className="px-3" onClick={sendMessage}><PaperAirplaneIcon className="h-5 text-white" /></button>
+            {vocieMessageStart && (
+                <button className="pl-2" onClick={() => {
+                    pauseRecording();
+                    stopRecording();
+                    setIsActive(!isActive);
+                  }}>
+                <PauseIcon className="h-5 text-white" />
+                    
+                </button>
+            )}
+            {vocieMessageStart == false ? (
+                <button  type="submit" className="px-3" onClick={sendMessage}><PaperAirplaneIcon className="h-5 text-white" /></button>
+            ) : isActive == false ? (
+                <button  type="submit" className="px-3" onClick={sendMessage}><PaperAirplaneIcon className="h-5 text-white" /></button>
+            ) : ""}
         </div>
     </div>
   )
