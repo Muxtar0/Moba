@@ -3,17 +3,17 @@ import { useRouter } from 'next/router'
 import React, { useEffect, useRef, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { useCollection } from 'react-firebase-hooks/firestore'
-import { auth, db } from '../firebase'
+import { auth, db, storage } from '../firebase'
 import Message from './Message'
 import getRecipientTag from '../utils/getRecipientTag'
 import Moment from 'react-moment'
-import { PaperAirplaneIcon,XIcon,MicrophoneIcon,PauseIcon } from "@heroicons/react/solid";
-import { useReactMediaRecorder } from "react-media-recorder";
+import { PaperAirplaneIcon,XIcon,PhotographIcon } from "@heroicons/react/solid";
 import { Picker } from 'emoji-mart'
 import 'emoji-mart/css/emoji-mart.css'
 import {
     EmojiHappyIcon,
 } from '@heroicons/react/outline'
+import { getDownloadURL, ref, uploadString } from 'firebase/storage'
 function ChatScreen({chat,messages}) {
     const [user] = useAuthState(auth)
     const [input,setInput] = useState("")
@@ -22,11 +22,9 @@ function ChatScreen({chat,messages}) {
     const size = useWindowSize();
     const [showEmojis, setShowEmojis] = useState(false)
 
-    const [second, setSecond] = useState("00");
-    const [minute, setMinute] = useState("00");
-    const [isActive, setIsActive] = useState(false);
-    const [counter, setCounter] = useState(0);
-    const [vocieMessageStart,setVoiceMessageStart] = useState(false);
+    const filePickerRef = useRef()
+    const [selectedFile, setSelectedFile] = useState(null)
+
 
     const [messagesSnapshot] = useCollection(query(collection(db,"chats",router.query.id,"messages"),orderBy("timeStamp",'asc')))
     const [recipientSnapshot] = useCollection(query(collection(db,"users"),where('tag' , "==", getRecipientTag(chat.users,user))))
@@ -60,92 +58,64 @@ function ChatScreen({chat,messages}) {
             ))
         }
     }
-    useEffect(() => {
-        let intervalId;
     
-        if (isActive) {
-          intervalId = setInterval(() => {
-            const secondCounter = counter % 60;
-            const minuteCounter = Math.floor(counter / 60);
-    
-            let computedSecond =
-              String(secondCounter).length === 1
-                ? `0${secondCounter}`
-                : secondCounter;
-            let computedMinute =
-              String(minuteCounter).length === 1
-                ? `0${minuteCounter}`
-                : minuteCounter;
-    
-            setSecond(computedSecond);
-            setMinute(computedMinute);
-    
-            setCounter((counter) => counter + 1);
-          }, 650);
-        }
-    
-        return () => clearInterval(intervalId);
-      }, [isActive, counter]);
-      function stopTimer() {
-        setIsActive(false);
-        setCounter(0);
-        setSecond("00");
-        setMinute("00");
+    const sendPhoto = (e) => {
+      const reader = new FileReader()
+      
+      if(e.target.files[0]){
+          reader.readAsDataURL(e.target.files[0]);
       }
-      const {
-        status,
-        startRecording,
-        stopRecording,
-        pauseRecording,
-        mediaBlobUrl
-      } = useReactMediaRecorder({
-        video: false,
-        audio: true,
-        echoCancellation: true
-      });
 
-      const convertFileToBase64 = (file) =>
-            new Promise((resolve, reject) => {
-            const reader = new FileReader();
-            reader.readAsDataURL(file.mediaBlobUrl);
+      reader.onload = (readerEvent) => {
+          setSelectedFile(readerEvent.target.result)
+      }
+    }
 
-            reader.onload = () =>
-                resolve({
-                fileName: file.title,
-                base64: reader.result
-                });
-            reader.onerror = reject;
-        });
-
-    const sendMessage = (e) => {
+    const sendMessage = async (e) => {
         e.preventDefault();
-        if(vocieMessageStart){
-            console.log("deed: ", mediaBlobUrl);
-            setVoiceMessageStart(false)
+        if(selectedFile){
+          if(selectedFile.split("/")[0] == "data:video"){
+            alert("You can't send video")
+            setSelectedFile(null)
+          }
+          else{
+            setDoc(doc(db, "users", user.uid), {
+              lastSeen:serverTimestamp(),
+            }, {merge:true});
+            
+            const imageRef = ref(storage , `chats/chat/${router.query.id}/image`)
+  
+               await uploadString(imageRef,selectedFile,"data_url").then(async () => {
+                const downloadURL = await getDownloadURL(imageRef);
+                if(downloadURL){
+                  const docRef = await addDoc(collection(db,'chats',router.query.id,"messages") , {
+                    timeStamp:serverTimestamp(),
+                    message:downloadURL,
+                    user:user.email.split("@")[0]
+                  })
+                }
+            })
+            setSelectedFile(null)
+            setInput("")
+            setShowEmojis(false)
+            scrollToBottom()
+          }
+        }
+        else{
+          if(e.target.value !== undefined || e.target.value !== " " || e.target.value !== "" || e.target.value !== null){
             setDoc(doc(db, "users", user.uid), {
                 lastSeen:serverTimestamp(),
             }, {merge:true});
             const docRef = addDoc(collection(db,'chats',router.query.id,"messages") , {
                 timeStamp:serverTimestamp(),
-                message:mediaBlobUrl,
+                message:input,
                 user:user.email.split("@")[0]
             })
+            setInput("")
+            setShowEmojis(false)
             scrollToBottom()
-        }
-        else{
-            if(e.target.value !== undefined || e.target.value !== " " || e.target.value !== "" || e.target.value !== null){
-                setDoc(doc(db, "users", user.uid), {
-                    lastSeen:serverTimestamp(),
-                }, {merge:true});
-                const docRef = addDoc(collection(db,'chats',router.query.id,"messages") , {
-                    timeStamp:serverTimestamp(),
-                    message:input,
-                    user:user.email.split("@")[0]
-                })
-                setInput("")
-                setShowEmojis(false)
-                scrollToBottom()
-            }
+          }
+        
         }
     }
     const addEmoji = (e) => {
@@ -209,44 +179,28 @@ function ChatScreen({chat,messages}) {
                 />
               )}
         <div className="flex bg-black border-t border-gray-800 items-center px-3 py-3 sticky bottom-0 z-[100]">
-            {size.width > 640 ? ( vocieMessageStart == false ? (
+            {size.width > 640 ? (
+              !selectedFile && (
                 <button onClick={() => setShowEmojis(!showEmojis)}><EmojiHappyIcon className="h-5 text-white px-3" /></button>
+              )
             ) : ""
-                
-            ) : ''}
-            {vocieMessageStart == false ? (
-                <input value={input} onChange={e => setInput(e.target.value)} placeholder="Write Something..." className="flex-1 text-white items-center px-2 py-2 sticky bottom-0 border-none rounded-[10px] bg-[#1f1f1f] outline-none" type="text" />
-            ) : ""}
-            {!vocieMessageStart && (
-                <button className="pl-2" onClick={() => {
-                    setVoiceMessageStart(true)
-                      if (!isActive) {
-                        startRecording();
-                      } else {
-                        pauseRecording();
-                      }
-    
-                      setIsActive(!isActive);
-                    }}>
-                        <MicrophoneIcon className="h-5 text-white" />
-                    
-                </button>
+            }
+            {!selectedFile && (
+              <input value={input} onChange={e => setInput(e.target.value)} placeholder="Write Something..." className="flex-1 text-white items-center px-2 py-2 sticky bottom-0 border-none rounded-[10px] bg-[#1f1f1f] outline-none" type="text" />
             )}
-            {vocieMessageStart && (
-                <button className="pl-2" onClick={() => {
-                    pauseRecording();
-                    stopRecording();
-                    setIsActive(!isActive);
-                  }}>
-                <PauseIcon className="h-5 text-white" />
-                    
-                </button>
-            )}
-            {vocieMessageStart == false ? (
-                <button  type="submit" className="px-3" onClick={sendMessage}><PaperAirplaneIcon className="h-5 text-white" /></button>
-            ) : isActive == false ? (
-                <button  type="submit" className="px-3" onClick={sendMessage}><PaperAirplaneIcon className="h-5 text-white" /></button>
-            ) : ""}
+            <button className="pl-2" onClick={() => filePickerRef.current.click()}>
+              <PhotographIcon className="h-5 text-white" />
+              <input
+                  type="file"
+                  hidden
+                  onChange={sendPhoto}
+                  ref={filePickerRef}
+                />
+            </button>
+            {selectedFile && (<p className="text-[14px] ml-2 text-white">
+              Image
+            </p>)}
+            <button  type="submit" className="px-3" onClick={sendMessage}><PaperAirplaneIcon className="h-5 text-white" /></button>
         </div>
     </div>
   )

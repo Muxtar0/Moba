@@ -17,7 +17,6 @@ function  ChatSidebarDekstop({userImage,userName,tag,chatScreen,userDatas}) {
     const router = useRouter()
     const size = useWindowSize();
     const [isChatAddUserModalOpen,setIsChatAddUserModalOpen] = useRecoilState(chatAddUserModalState)
-    // console.log(userDatas)
       
             
     
