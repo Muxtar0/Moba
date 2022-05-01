@@ -1,6 +1,4 @@
 import { SearchIcon } from "@heroicons/react/outline";
-import Trending from "./Trending";
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import { useAuthState } from "react-firebase-hooks/auth";

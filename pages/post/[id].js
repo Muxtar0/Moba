@@ -20,7 +20,6 @@ import {
   import { ArrowLeftIcon } from "@heroicons/react/solid";
   import Comment from "../../components/Comment";
   import Head from "next/head";
-  import Login from '../../components/Login';
 import { useAuthState } from "react-firebase-hooks/auth";
 import PostModal from "../../components/PostModal";
 
@@ -105,7 +104,9 @@ function PostPage(props) {
             </div>
           )}
         </div>
-        
+        {isLoad && (
+          <Widgets userDatas={userDatas}/>
+        )}
 
         {isOpen && <Modal  userImage={userData.photoUrl} userName={userData.name} userTag={userData.tag} />}
         {isShareModalOpen && <ShareModal postID = {id}/>}

@@ -13,10 +13,7 @@ import {
 } from "@firebase/firestore";
 import { auth, db } from "../firebase";
 import {
-  CalendarIcon,
-  ChartBarIcon,
   EmojiHappyIcon,
-  PhotographIcon,
   XIcon,
 } from "@heroicons/react/outline";
 import { useRouter } from "next/router";

@@ -1,4 +1,4 @@
-import { SparklesIcon,LinkIcon,CalendarIcon } from '@heroicons/react/outline'
+import { LinkIcon,CalendarIcon } from '@heroicons/react/outline'
 import React, { useEffect, useState} from 'react'
 import { auth, db } from "../firebase";
 import {
@@ -9,7 +9,6 @@ import {
     orderBy,
     query,
     setDoc,
-    where, getDocs,getDoc
   } from "@firebase/firestore";
 import Post from '../components/Post'
 import { useAuthState } from 'react-firebase-hooks/auth';

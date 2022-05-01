@@ -4,16 +4,15 @@ import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db ,storage} from '../../firebase';
 import Sidebar from '../../components/Sidebar'
 import { useRouter } from "next/router";
-import { ArrowLeftIcon, SparklesIcon,PlusIcon } from '@heroicons/react/outline';
+import { PlusIcon } from '@heroicons/react/outline';
 import {
     collection,
     getDocs,
     updateDoc,
     doc,
-    query,where,setDoc
+    query,where,
   } from "@firebase/firestore";
 import { getDownloadURL, ref, uploadString,deleteObject   } from "@firebase/storage";
-import { XIcon } from '@heroicons/react/solid';
 import PostModal from '../../components/PostModal';
 import { postModalState } from '../../atoms/modalAtom';
 import { useRecoilState } from 'recoil';
@@ -35,7 +34,6 @@ function EditUser({data}) {
   const [bioInp,setBioInp] = useState("")
   const [websiteInp,setWebsiteInp] = useState("")
   const [saving,setSaving] = useState(false)
-    const [image,setImage] = useState("")
     let postIdS = []
     let allPostsIdS =[]
     let commentsIdS = []

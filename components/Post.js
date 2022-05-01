@@ -7,10 +7,8 @@ import {
   orderBy,
   query,
   setDoc,
-  addDoc,
 } from "@firebase/firestore";
 import {
-  ChartBarIcon,
   ChatIcon,
   DotsHorizontalIcon,
   HeartIcon,
@@ -28,9 +26,7 @@ import Moment from "react-moment";
 import { useRecoilState } from "recoil";
 import { modalState, postIdState, shareModalState, sharePostIDstate } from "../atoms/modalAtom";
 import { auth, db } from "../firebase";
-import parse from 'html-react-parser';
 
-import Link from 'next/link'
 import { useAuthState } from 'react-firebase-hooks/auth';
 function Post({id,post,postPage,userName,userTag,userImage}) {
   const [user] = useAuthState(auth)
@@ -44,8 +40,6 @@ function Post({id,post,postPage,userName,userTag,userImage}) {
   const [likes,setLikes] = useState([]);
   const [isLinkHave , setIsLinkHave] = useState(false)
   const [linkText , setLinkText] = useState("")
-  const [isDeleting,setIsDeleting] = useState(false)
-  const [postPageUrl,setPostPageUrl] = useState("")
   const parse = require('html-react-parser');
 
 

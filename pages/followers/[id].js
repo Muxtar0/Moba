@@ -6,6 +6,7 @@ import Sidebar from '../../components/Sidebar'
 import { useAuthState } from 'react-firebase-hooks/auth'
 import { AnnotationIcon } from '@heroicons/react/solid'
 import Head from "next/head";
+import Widgets from '../../components/Widgets'
 function Followers({followersData,userData,allDatas}) {
     const router = useRouter()
     const {id} = router.query
@@ -44,9 +45,10 @@ function Followers({followersData,userData,allDatas}) {
         {isLoad && (
           <Sidebar photoUrl={userDataAll.photoUrl} tag={userDataAll.tag} userName={userDataAll.name} />
         )}
+        <main className='bg-black min-h-screen flex max-w-[1500px] mx-auto'>
         <div className='text-white flex-grow min-h-screen border-l border-r  border-gray-700 max-w-2xl sm:ml-[73px] xl:ml-[200px] 2xl:ml-[450px] 2xl:max-w-[1500px]'>
             <div className='text-[#d9d9d9] flex items-center sm:justify-between py-2 px-3 sticky top-0 z-50 bg-black bg-opacity-90'>
-                <h2 className='text-lg sm:text-xl font-bold'>Home</h2>
+                <h2 className='text-lg sm:text-xl font-bold'>Followers</h2>
                 <div onClick={() => router.push('/chat')} className='hoverAnimation h-9 w-9 flex items-center justify-center xl:px-0 ml-auto'>
                     <AnnotationIcon className='h-5 text-white' />
                 </div>
@@ -64,6 +66,11 @@ function Followers({followersData,userData,allDatas}) {
         )}
             <div className="pb-20"></div>
         </div>
+        {isLoad && (
+          <Widgets userDatas={userDatas}/>
+          )}
+        </main>
+        
         
     </div>
   )

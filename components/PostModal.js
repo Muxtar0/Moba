@@ -4,8 +4,6 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Picker } from 'emoji-mart'
 import 'emoji-mart/css/emoji-mart.css'
 import {
-  CalendarIcon,
-  ChartBarIcon,
   EmojiHappyIcon,
   PhotographIcon,
   XIcon,

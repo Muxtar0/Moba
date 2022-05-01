@@ -2,9 +2,6 @@ import Image from "next/image";
 import { auth, provider,db } from "../firebase";
 import LogoImg from '../img/Logo.png'
 import {signInWithPopup } from "firebase/auth";
-import { useRecoilState  } from "recoil";
-import { userInfoState,shareModalState } from "../atoms/modalAtom";
-import {useAuthState} from 'react-firebase-hooks/auth'
 
 import { useEffect } from "react";
 function Login() {

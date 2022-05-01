@@ -1,28 +1,18 @@
 import Head from "next/head";
 import Sidebar from '../components/Sidebar'
 import Feed from '../components/Feed'
-import Login from '../components/Login'
 import Modal from '../components/Modal'
 import PostModal from '../components/PostModal'
-import ClipBoardSuccesfull from '../components/ClipBoardSuccesfull'
 import ShareModal from '../components/ShareModal'
-import { modalState, postIdState, shareModalState, postModalState, sharePostIDstate, userInfoState } from "../atoms/modalAtom";
-import { RecoilRoot , useRecoilState} from 'recoil'
+import { modalState, postIdState, shareModalState, postModalState, sharePostIDstate } from "../atoms/modalAtom";
+import {  useRecoilState} from 'recoil'
 import Widgets from '../components/Widgets'
-import { db, storage } from "../firebase";
+import { db } from "../firebase";
 
 import { useEffect, useState } from "react";
-import LogoIMG from '../img/Logo.png'
-import {signOut } from "firebase/auth";
-import { auth, provider } from "../firebase";
+import { auth } from "../firebase";
 import {
-  addDoc,
-  collection,
-  doc,
-  serverTimestamp,
-  setDoc,
-  updateDoc,
-  query, where, getDocs,onSnapshot,orderBy,getDoc,getColl
+  collection, getDocs,
 } from "@firebase/firestore";
 import { useAuthState } from "react-firebase-hooks/auth";
 const Home = (props) => {

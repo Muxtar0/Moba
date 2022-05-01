@@ -12,14 +12,12 @@ import {
 import LogoImg from '../img/Logo.png'
 import { useRouter } from 'next/router';
 import { useRecoilState } from 'recoil';
-import { postModalState, userInfoState } from '../atoms/modalAtom';
-import { collection, query, where, getDocs,doc,getDoc } from "firebase/firestore";
-import {db,auth} from '../firebase'
+import { postModalState } from '../atoms/modalAtom';
+import {auth} from '../firebase'
 import {useAuthState} from 'react-firebase-hooks/auth'
 import {signOut } from "firebase/auth";
 function Sidebar(props) {
   const [user] = useAuthState(auth)
-  const [userInfo, setUserInfo] = useState();
   const [windowInnerWidth,setWindowInnerWidth] = useState();
   const [profileModal , setProfileModal] = useState(false)
   const [postModal,setPostModal] = useRecoilState(postModalState)

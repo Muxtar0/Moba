@@ -4,6 +4,7 @@ import React, { useEffect, useState } from 'react'
 import { useAuthState } from 'react-firebase-hooks/auth';
 import Sidebar from '../components/Sidebar';
 import UsersUser from '../components/UsersUser';
+import Widgets from '../components/Widgets';
 import { auth, db } from '../firebase';
 
 function Users({data}) {
@@ -27,11 +28,16 @@ function Users({data}) {
             <title>Moba | Users</title>
             <link rel="icon" href="/Logo.png" />
         </Head>
-        <main>
+        <main className="bg-black min-h-screen flex max-w-[1500px] mx-auto">
         {isLoad && (
           <Sidebar photoUrl={userData.photoUrl} tag={userData.tag} userName={userData.name} />
         )}
+        
         <UsersUser Datas={JSON.parse(data)} />
+
+        {isLoad && (
+          <Widgets userDatas={userDatas}/>
+        )}
         </main>
     </div>
   )

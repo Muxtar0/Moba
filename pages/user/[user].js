@@ -2,25 +2,19 @@ import React, { useEffect, useState } from 'react'
 import Head from "next/head";
 import { useRouter } from "next/router";
 import {
-    addDoc,
     collection,
-    doc,
-    serverTimestamp,
-    setDoc,
-    updateDoc,
-    query, where, getDocs,onSnapshot,orderBy,getDoc,getColl
+     getDocs,
   } from "@firebase/firestore";
 import { useAuthState } from 'react-firebase-hooks/auth';
 import { auth, db } from '../../firebase';
 import Sidebar from '../../components/Sidebar';
-import { ArrowLeftIcon } from '@heroicons/react/solid';
 import MobaUserCom from '../../components/MobaUserCom'
 import { modalState, postModalState, shareModalState, sharePostIDstate } from '../../atoms/modalAtom';
 import { useRecoilState } from 'recoil';
 import PostModal from '../../components/PostModal';
 import Modal from '../../components/Modal';
 import ShareModal from '../../components/ShareModal';
-import ClipBoardSuccesfull from '../../components/ClipBoardSuccesfull';
+import Widgets from '../../components/Widgets';
 function UserPage(props) {
     const router = useRouter()
     const {user} = router.query
@@ -63,6 +57,9 @@ function UserPage(props) {
         {isPostModalOpen && <PostModal userImage={userData.photoUrl} userName={userData.name} userTag={userData.tag}/>}
         {isCommentModalOpen && (
           <Modal userImage={userData.photoUrl} userName={userData.name} userTag={userData.tag}/>
+        )}
+        {isLoad && (
+          <Widgets userDatas={userDatas}/>
         )}
         {isShareOpen && <ShareModal postID = {sharePostID} />}
       </main>

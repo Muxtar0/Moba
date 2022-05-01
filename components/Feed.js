@@ -1,12 +1,9 @@
 import { AnnotationIcon } from '@heroicons/react/outline'
 import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
 import React, { useEffect, useState } from 'react'
-import { useRecoilState } from 'recoil';
-import { shareModalState } from '../atoms/modalAtom';
 import { db } from '../firebase';
 import Input from './Input'
 import Post from './Post'
-import ShareModal from './ShareModal';
 import { useRouter } from "next/router";
 function Feed({userImage,userName,userTag}) {
     const [posts,setPosts] = useState([]);
