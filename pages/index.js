@@ -59,7 +59,9 @@ const Home = (props) => {
         {isLoad && (
           <Feed userImage={userData.photoUrl} userName={userData.name} userTag={userData.tag} />
         )}
-        
+        {isLoad && (
+          <Widgets userDatas={userDatas}/>
+        )}
         {isOpen && <Modal userImage={userData.photoUrl} userName={userData.name} userTag={userData.tag}/>}
         {isPostModalOpen && <PostModal userImage={userData.photoUrl} userName={userData.name} userTag={userData.tag}/>}
         {isShareOpen && <ShareModal postID = {sharePostID} />}

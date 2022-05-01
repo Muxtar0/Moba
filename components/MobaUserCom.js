@@ -20,6 +20,7 @@ function MobaUserCom({userImage,userName,userTag,creationTime,userID,bio,website
     const [user] = useAuthState(auth)
     const [isFollowing,setIsFollowing] = useState(true)
     const [followers,setFollowers] = useState([])
+    const [followings,setFollowings] = useState([])
     const [posts,setPosts] = useState([])
     const [limitLink,setLimitLink] = useState(30)
     const creationTimeMain = creationTime.split(' ')
@@ -34,10 +35,15 @@ function MobaUserCom({userImage,userName,userTag,creationTime,userID,bio,website
     useEffect(() => {
         getPosts();
     },[])
-    useEffect(() =>
-    onSnapshot(collection(db, "users", userID, "followers"), (snapshot) =>
+    useEffect(() =>{
+        onSnapshot(collection(db, "users", userID, "followers"), (snapshot) =>
       setFollowers(snapshot.docs)
-    ),
+    )
+    onSnapshot(collection(db, "users", userID, "following"), (snapshot) =>
+    setFollowings(snapshot.docs)
+    )
+    }
+    ,
         [db,userTag]
     );
     useEffect(() => {
@@ -47,12 +53,17 @@ function MobaUserCom({userImage,userName,userTag,creationTime,userID,bio,website
     },[followers])
     const followHandler = async () => {
         const followRef = doc(db,'users',userID,'followers',user.uid)
+        const followingRef = doc(db,'users',user.uid,'following',userID)
         if(isFollowing){
           await deleteDoc(followRef)
+          await deleteDoc(followingRef)
         } 
         else{
           await setDoc(followRef, {
             userId: user.uid,
+          })
+          await setDoc(followingRef, {
+            userId:userID,
           })
         }
       }
@@ -87,7 +98,10 @@ function MobaUserCom({userImage,userName,userTag,creationTime,userID,bio,website
                         }</a>
                         <p className={`text-gray-600 text-[15px] flex mt-2 sm:mt-0 items-center ${website.length > 1 && `sm:ml-2`}`}><CalendarIcon className="h-4 mr-1" />Joined {creationTimeMain[1] + " " + creationTimeMain[2] + " " + creationTimeMain[3]}</p>
                     </div>
-                    <p className="text-white mt-2 font-bold">{followers.length} <span className="text-gray-500 font-normal">Followers</span></p>
+                    <div className="flex items-center">
+                        <p onClick={() => {router.push(`/followers/${userID}`)}} className="text-white cursor-pointer group transition mt-2 font-bold">{followers.length} <span className="text-gray-500 group-hover:underline font-normal">Followers</span></p>
+                        <p onClick={() => {router.push(`/followings/${userID}`)}} className="text-white ml-4 cursor-pointer group transition mt-2 font-bold">{followings.length} <span className="text-gray-500 group-hover:underline font-normal">Followings</span></p>
+                    </div>
                 </div>
                 <div className="flex justify-start absolute right-6 top-[-50px] flex-col items-center">
                     {userID != user.uid ? (
